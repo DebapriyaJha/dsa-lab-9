@@ -1,0 +1,197 @@
+// 2. WAP to implement sparse matrix using linked list as follows
+// 	i.   Transpose
+// 	ii.  Addition
+// 	iii. Multiplication
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node{
+    int row;
+    int col;
+    int ele;
+    struct node *next;
+
+}*start1,*start2,*start3;
+
+void display(struct node *start){
+    printf("Total Row : %d ,Total Col : %d ,Total Ele : %d \n",start->row,start->col,start->ele);
+    struct node *q1 = start->next;
+    printf("Row\tCol\tEle\n");
+    while(q1!=NULL){
+        printf("%d\t%d\t%d\n",q1->row,q1->col,q1->ele);
+        q1=q1->next;
+    }
+}
+
+void transpose(struct node *start){
+    struct node *q1=start;
+    while(q1!=NULL){
+        int temp=q1->row;
+        q1->row=q1->col;
+        q1->col=temp;
+        q1=q1->next;
+    }
+    
+    
+}
+
+void insert_end(int value,int row,int col){
+    struct node  *temp=(struct node *)malloc(sizeof(struct node));
+    temp->row=row;
+    temp->col=col;
+    temp->ele=value;
+    if(start3->next==NULL){
+        start3->next=temp;
+    }
+    else{
+        struct node *q;
+        for(q=start3->next;q->next!=NULL;q=q->next);
+        q->next=temp;
+        q=temp;
+    }
+    
+
+}
+
+void multiplication(struct node *start1,struct node *start2){
+    if(start1->col != start2-> row){
+        printf("Multiplication cant be done ");
+        return ;
+    }
+    start3=(struct node *)malloc(sizeof(struct node));
+    start3->row=start1->row;
+    start3->col=start2->col;
+
+    for(struct node * p1=start1->next;p1!=NULL;p1=p1->next){
+        for(struct node * p2=start2->next;p2!=NULL;p2=p2->next){
+            if(p1->col == p2->row){
+                int val=p1->ele * p2->ele;
+                insert_end(val,p1->row,p2->col);
+            }
+        }
+    }
+    // Duplicate removal
+    for(struct node *p1=start3->next;p1->next!=NULL;p1=p1->next){
+        struct node *prev=p1;
+        for(struct node * p2=p1->next;p2->next!=NULL;){
+            if(p1->row==p2->row && p1->col == p2->col){
+                p1->ele = p1->ele + p2->ele;
+                prev->next=p2->next;
+                free(p2);
+                p2=prev->next;
+            }
+            else{
+                prev=p2;
+                p2=p2->next;
+            }
+        }
+    }
+    
+    int count=0;
+    for(struct node *ptr=start3->next;ptr!=NULL;ptr=ptr->next){
+        count++;
+    }
+    start3->ele=count;
+
+}
+void addition(struct node *start1,struct node *start2){
+    if(start1->row != start2->row || start1->col != start2->col){
+        printf("addition cant be done : ");
+        return;
+    }
+    if(start1->next==NULL){
+        start1->next=start2->next;
+    }
+    else{
+        struct node *ptr;
+        for(ptr=start1->next;ptr->next!=NULL;ptr=ptr->next);
+        ptr->next=start2->next;
+
+    }
+
+    // Duplicate removal
+    for(struct node *p1=start1->next;p1->next!=NULL;p1=p1->next){
+        struct node *prev=p1;
+        for(struct node * p2=p1->next;p2!=NULL;){
+            if(p1->row==p2->row && p1->col == p2->col){
+                p1->ele = p1->ele + p2->ele;
+                prev->next=p2->next;
+                free(p2);
+                p2=prev->next;
+            }
+            else{
+                prev=p2;
+                p2=p2->next;
+            }
+        }
+    }
+
+    int count=0;
+    for(struct node *ptr=start1->next;ptr!=NULL;ptr=ptr->next){
+        count++;
+    }
+    start1->ele=count;
+        
+}
+
+int main(){
+    start1=(struct node *)malloc(sizeof(struct node));
+    /* First node contains information about total row,total col and total non zero element in linked list*/
+    printf("For first matrix ,Enter the total row , total col,total element : ");
+    scanf("%d%d%d",&start1->row,&start1->col,&start1->ele);
+
+    struct node *q1=start1;
+    printf("Enter the elements of Sparse matrix as row , col , ele : \n");
+    for(int i=0 ; i < start1->ele ; i++){
+        struct node  *temp=(struct node *)malloc(sizeof(struct node));
+        scanf("%d%d%d",&temp->row,&temp->col,&temp->ele);
+        temp->next=NULL; 
+        q1->next=temp;
+        q1=temp;
+      
+    }
+
+    start2=(struct node *)malloc(sizeof(struct node));
+    /* First node contains information about total row,total col and total non zero element in linked list*/
+    printf("or second matrix ,Enter the total row , total col,total element : ");
+    scanf("%d%d%d",&start2->row,&start2->col,&start2->ele);
+
+    struct node *q2=start2;
+    printf("Enter the elements of Sparse matrix as row , col , ele : \n");
+    for(int i=0 ; i < start2->ele ; i++){
+        struct node  *temp=(struct node *)malloc(sizeof(struct node));
+        scanf("%d%d%d",&temp->row,&temp->col,&temp->ele);
+        temp->next=NULL; 
+        q2->next=temp;
+        q2=temp;
+    }
+
+    printf("First Original Sparse matrix is : ");
+    display(start1);
+    printf("Second Original Sparse matrix is : ");
+    display(start2);
+
+    
+
+    // Multiplication is done and result is put into start3 No change in start1 and start2
+    printf("After multiplication : ");
+    multiplication(start1,start2);
+    display(start3);
+    printf("\nMultiplication Over \n");
+
+    printf("Done Transpose of start 2 ");
+    transpose(start2);
+    display(start2);
+    transpose(start2);
+    display(start2);
+
+
+    // During addition change is made in start 1 so you cant find original start1 after this 
+    printf("After addition: \n ");
+    addition(start1,start2);
+    display(start1);
+
+    
+   
+}
